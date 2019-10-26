@@ -27,5 +27,3 @@ with open('contour.txt', 'w+') as f:
 for contour in contours:
     cv2.drawContours(image=image, contours=contour, contourIdx=-1, color=(0, 0, 255), thickness=3)
 cv2.imwrite('contour.jpg', image)
-
-# img_contour_finding
