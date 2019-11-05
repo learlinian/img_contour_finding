@@ -6,11 +6,13 @@ from utils.find_contour import findContours
 
 
 def correlation(arr1, arr2):
-    arr = arr1[np.newaxis]
-    arr_conj = np.conj(arr)
-    arr_t = np.transpose(arr_conj)
+    arr_1 = arr1[np.newaxis]
+    arr_1_conj = np.conj(arr_1)
+    arr_1_t = np.transpose(arr_1_conj)
 
-    return np.absolute(arr.dot(arr_t))[0][0]
+    arr_2 = arr2[np.newaxis]
+
+    return np.absolute(arr_2.dot(arr_1_t))[0][0]
 
 
 def measure_sim(vec1, vec2):
@@ -31,8 +33,8 @@ def detect_contour_fft(model_path, test_img_path):
     contour_length = []  # array to record contour length
     for contour in contours:
         contour_length.append(len(contour))
-    # del contours[contour_length.index(max(contour_length))]
-    # del contour_length[contour_length.index(max(contour_length))]
+    del contours[contour_length.index(max(contour_length))]
+    del contour_length[contour_length.index(max(contour_length))]
 
     contour_list = []
     for contour in contours:
@@ -48,37 +50,33 @@ def detect_contour_fft(model_path, test_img_path):
         contour_complex = np.array(contour_complex)
         fft_spectrum = np.fft.fft(contour_complex)
         # fft normalization
-        for i, spectrum in enumerate(fft_spectrum):
-            fft_spectrum[i] = spectrum / abs(fft_spectrum[1])
+        fft_spectrum /= abs(fft_spectrum[1])
         truncate_contour = fft_spectrum[1:model_spectrum.size + 1]
         contour_list_in_complex.append(truncate_contour)
-
-    # print(contour_list_in_complex[1])
-
-    
 
     # calculate similarity of spectrums
     sim_list = []
     for i, spectrum in enumerate(contour_list_in_complex):
         if(spectrum.size < model_spectrum.size):
-            # pad zeros
-            extended_array = np.zeros(model_spectrum.shape, dtype="complex_")
-            extended_array[: spectrum.shape[0]] = spectrum
-            sim = measure_sim(extended_array, model_spectrum)
+            # # pad zeros
+            # extended_array = np.zeros(model_spectrum.shape, dtype="complex_")
+            # extended_array[: spectrum.shape[0]] = spectrum
+            sim = measure_sim(spectrum, model_spectrum[:spectrum.size])
         else:
             sim = measure_sim(spectrum, model_spectrum)
         sim_list.append(sim)
 
     # print histogram of RMSE and observe error distribution
-    plt.hist(sim_list)
+    # plt.hist(sim_list)
     
 
     result_list = []
     for i, acc in enumerate(sim_list):
         # set treshold of the miss matching of 2 spectrums
-        if acc > 0.1:
+        if acc > 0.81:
             result_list.append(i)
-    print(result_list)
+            print(i, acc)
+
     for i, contour in enumerate(contours):
         if i in result_list:
             # draw the contour in image and stored in for validation
@@ -86,7 +84,8 @@ def detect_contour_fft(model_path, test_img_path):
                              contourIdx=-1, color=(0, 0, 255), thickness=3)
 
     cv2.imwrite('./result/detection_result.jpg', test_img)
-    # plt.imshow(test_img)
+
+    plt.imshow(test_img)
     plt.show()
 
     #####################################################################

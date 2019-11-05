@@ -54,7 +54,8 @@ def findContours(img_path):
             if i == last_i + 1:
                 continue
             # draw the contour in image and stored in for validation
-            contour_list.append(np.asarray(contour))
+            new_contour = np.concatenate((contour, [contour[0]]), axis=0)
+            contour_list.append(new_contour)
             last_i = i
 
     return contour_list, hierarchy
@@ -62,8 +63,8 @@ def findContours(img_path):
 
 if __name__ == "__main__":
     contours, hierarchy = findContours('./image/template.png')
-    print("testing the model usability......\n")
-    print(len(contours), "contours found\n")
-    print("hierarchy:\n", hierarchy)
-    for i, contour in enumerate(contours):
-        print("\ncontour ", i + 1, " :\n")
+    # print("testing the model usability......\n")
+    # print(len(contours), "contours found\n")
+    # print("hierarchy:\n", hierarchy)
+    # for i, contour in enumerate(contours):
+    #     print("\ncontour ", i + 1, " :\n")
