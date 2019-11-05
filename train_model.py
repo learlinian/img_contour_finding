@@ -16,7 +16,7 @@ def train_fft_model(img_path):
             valid_contour_list.append(np.asarray(contour))
             # draw the contour in image and stored it for validation
             cv2.drawContours(image=image, contours=contour,
-                             contourIdx=-1, color=(0, 0, 255), thickness=3)
+                            contourIdx=-1, color=(0, 0, 255), thickness=3)
     cv2.imwrite('./result/template_contour.jpg', image)
     valid_template = valid_contour_list[0]
     
@@ -31,13 +31,12 @@ def train_fft_model(img_path):
     # perform discrete fourier transform
     fft_spectrum = np.fft.fft(contour_in_complex)
     # fft normalization
-    for i, spectrum in enumerate(fft_spectrum):
-        fft_spectrum[i] = spectrum / abs(fft_spectrum[1])
+    fft_spectrum /= abs(fft_spectrum[1])
     
     np.savetxt('./model/fft_contour.txt', fft_spectrum)
     
     # truncate the spectrum and only retain low frequency componenet (15%)
-    truncated_fft_spectrum = fft_spectrum[1:int(fft_spectrum.size * 0.15)] # remove DC component(0-frequency)
+    truncated_fft_spectrum = fft_spectrum[1:int(fft_spectrum.size * 0.10)] # remove DC component(0-frequency)
 
     np.savetxt('./model/truncated_fft_contour.txt', truncated_fft_spectrum)
 
