@@ -12,7 +12,8 @@ def findContours(img_path):
 
     # blur the image using Guassian
     blur = cv2.GaussianBlur(src=gray, ksize=(13, 13), sigmaX=0)
-    (t, binary) = cv2.threshold(src=blur, thresh=155, maxval=255, type=cv2.THRESH_BINARY)
+    (t, binary) = cv2.threshold(src=blur,
+                                thresh=155, maxval=255, type=cv2.THRESH_BINARY)
 
     # Sobel edge detector
     sobel_x = cv2.Sobel(binary, cv2.CV_32F, 1, 0)
@@ -60,10 +61,9 @@ def findContours(img_path):
 
 
 if __name__ == "__main__":
-    contours, hierarchy = findContours(r'..\image\template.png')
+    contours, hierarchy = findContours('./image/template.png')
     print("testing the model usability......\n")
     print(len(contours), "contours found\n")
     print("hierarchy:\n", hierarchy)
     for i, contour in enumerate(contours):
         print("\ncontour ", i + 1, " :\n")
-        # print(contour)
