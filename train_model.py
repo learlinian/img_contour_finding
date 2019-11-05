@@ -30,10 +30,15 @@ def train_fft_model(img_path):
     
     # perform discrete fourier transform
     fft_spectrum = np.fft.fft(contour_in_complex)
+    # fft normalization
+    for i, spectrum in enumerate(fft_spectrum):
+        fft_spectrum[i] = spectrum / abs(fft_spectrum[1])
+    
     np.savetxt('./model/fft_contour.txt', fft_spectrum)
     
     # truncate the spectrum and only retain low frequency componenet (15%)
-    truncated_fft_spectrum = fft_spectrum[:int(fft_spectrum.size * 0.15)]
+    truncated_fft_spectrum = fft_spectrum[1:int(fft_spectrum.size * 0.15)] # remove DC component(0-frequency)
+
     np.savetxt('./model/truncated_fft_contour.txt', truncated_fft_spectrum)
 
     # show detected contour
