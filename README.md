@@ -3,3 +3,9 @@
 
 To install required packages:
 > conda install --file requirements.txt
+
+To use this software
+1. Train
+> python3 train_model.py
+2. Detect
+> python3 detect_contour.py
