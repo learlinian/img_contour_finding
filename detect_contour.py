@@ -67,13 +67,13 @@ def detect_contour_fft(model_path, test_img_path):
         sim_list.append(sim)
 
     # print histogram of RMSE and observe error distribution
-    # plt.hist(sim_list)
+    plt.hist(sim_list)
     
 
     result_list = []
     for i, acc in enumerate(sim_list):
         # set treshold of the miss matching of 2 spectrums
-        if acc > 0.81:
+        if acc > 0.93:
             result_list.append(i)
             print(i, acc)
 

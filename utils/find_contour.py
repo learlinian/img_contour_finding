@@ -26,8 +26,8 @@ def findContours(img_path):
         edge_image, None, 0., 255., cv2.NORM_MINMAX, cv2.CV_8U)
 
     # thining
-    # edge_image = cv2.ximgproc.thinning(
-    #     edge_image, None, cv2.ximgproc.THINNING_GUOHALL)
+    edge_image = cv2.ximgproc.thinning(
+        edge_image, None, cv2.ximgproc.THINNING_GUOHALL)
 
     # get contour
     cv2_version = cv2.__version__.split('.')[0]
@@ -49,14 +49,16 @@ def findContours(img_path):
 
     last_i = -2     # set last valid contour index as -2
     for i, contour in enumerate(contours):
-        if hierarchy[0, i, 3] == -1:
+        #if hierarchy[0, i, 3] == -1:
             # if current contour is followed by last one, skip
-            if i == last_i + 1:
-                continue
+        #    if i == last_i + 1:
+        #        continue
             # draw the contour in image and stored in for validation
-            new_contour = np.concatenate((contour, [contour[0]]), axis=0)
-            contour_list.append(new_contour)
-            last_i = i
+        if((contour[0][0][0] - contour[-1][0][0]) > 2 or (contour[0][0][1] - contour[-1][0][1]) > 2):
+            continue
+        new_contour = np.concatenate((contour, [contour[0]]), axis=0)
+        contour_list.append(new_contour)
+        last_i = i
 
     return contour_list, hierarchy
 

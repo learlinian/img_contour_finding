@@ -12,10 +12,10 @@ def train_fft_model(img_path):
     # extract the template contour of number '6' 
     valid_contour_list = []
     for i, contour in enumerate(contours):
-        #if hierarchy[0, i, 3] == -1:
-        valid_contour_list.append(np.asarray(contour))
+        if hierarchy[0, i, 3] == -1:
+            valid_contour_list.append(np.asarray(contour))
             # draw the contour in image and stored it for validation
-        cv2.drawContours(image=image, contours=contour,
+            cv2.drawContours(image=image, contours=contour,
                             contourIdx=-1, color=(0, 0, 255), thickness=3)
     cv2.imwrite('./result/template_contour.jpg', image)
     valid_template = valid_contour_list[0]
