@@ -18,10 +18,7 @@ def findContours(img_path):
     # Sobel edge detector
     sobel_x = cv2.Sobel(binary, cv2.CV_32F, 1, 0)
     sobel_y = cv2.Sobel(binary, cv2.CV_32F, 0, 1)
-    # print(sobel_x, sobel_y)
     edge_image = cv2.magnitude(sobel_x, sobel_y)
-    # print(edge_image)
-
     edge_image = cv2.normalize(
         edge_image, None, 0., 255., cv2.NORM_MINMAX, cv2.CV_8U)
 
@@ -45,28 +42,19 @@ def findContours(img_path):
     del contours[contour_length.index(max(contour_length))]
     del contour_length[contour_length.index(max(contour_length))]
 
-    contour_list = []   # list to append all contours in list
-
-    last_i = -2     # set last valid contour index as -2
+    # filter contours
+    contour_list = []
     for i, contour in enumerate(contours):
-        #if hierarchy[0, i, 3] == -1:
-            # if current contour is followed by last one, skip
-        #    if i == last_i + 1:
-        #        continue
-            # draw the contour in image and stored in for validation
-        if((contour[0][0][0] - contour[-1][0][0]) > 2 or (contour[0][0][1] - contour[-1][0][1]) > 2):
+        if((contour[0][0][0] - contour[-1][0][0]) > 2 or (contour[0][0][1] - contour[-1][0][1]) > 2 or contour[0][0][1] < 30):
             continue
         new_contour = np.concatenate((contour, [contour[0]]), axis=0)
         contour_list.append(new_contour)
-        last_i = i
 
     return contour_list, hierarchy
 
 
 if __name__ == "__main__":
     contours, hierarchy = findContours('./image/template.png')
-    # print("testing the model usability......\n")
-    # print(len(contours), "contours found\n")
-    # print("hierarchy:\n", hierarchy)
-    # for i, contour in enumerate(contours):
-    #     print("\ncontour ", i + 1, " :\n")
+    print("testing the model usability......\n")
+    print(len(contours), "contours found\n")
+    print("hierarchy:\n", hierarchy)
