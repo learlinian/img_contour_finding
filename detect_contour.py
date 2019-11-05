@@ -41,19 +41,24 @@ def detect_contour_fft(model_path, test_img_path):
 
     # print(contour_list_in_complex[1])
 
+    # compute magnitude of spectrum
     model_spectrum_magnitude = np.absolute(model_spectrum)
 
+    # calculate root mean square error
     rmse_list = []
     for i, spectrum in enumerate(contour_list_in_complex):
         spectrum_magnitude = np.absolute(spectrum)
         if(spectrum_magnitude.size < model_spectrum_magnitude.size):
+            # pad 0s if length is insufficient
             extended_array = np.zeros(model_spectrum_magnitude.shape)
             extended_array[: spectrum_magnitude.shape[0]] = spectrum_magnitude
-            mse = np.sqrt((extended_array - model_spectrum_magnitude)**2).mean()
+            # RMSE calculation
+            rmse = np.sqrt((extended_array - model_spectrum_magnitude)**2).mean()
         else:
-            mse = np.sqrt((spectrum_magnitude - model_spectrum_magnitude)**2).mean()
-        rmse_list.append(mse)
+            rmse = np.sqrt((spectrum_magnitude - model_spectrum_magnitude)**2).mean()
+        rmse_list.append(rmse)
     
+    # print histogram of RMSE
     # print(rmse_list[1])
     # plt.hist(rmse_list)
     # plt.show()
@@ -62,8 +67,6 @@ def detect_contour_fft(model_path, test_img_path):
     for i, error in enumerate(rmse_list):
         if error < 190:
             result_list.append(i)
-
-    print(rmse_list)
 
     for i, contour in enumerate(contours):
         if i in result_list:
