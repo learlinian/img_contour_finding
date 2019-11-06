@@ -6,10 +6,10 @@ from utils.find_contour import findContours
 
 
 def correlation(arr1, arr2):
+    arr_2 = arr2[np.newaxis]
     arr_1 = arr1[np.newaxis]
     arr_1_conj = np.conj(arr_1)
     arr_1_t = np.transpose(arr_1_conj)
-    arr_2 = arr2[np.newaxis]
 
     return np.absolute(arr_2.dot(arr_1_t))[0][0]
 
@@ -27,18 +27,10 @@ def detect_contour_fft(model_path, test_img_path):
     # find contours
     contours, hierarchy = findContours(test_img_path)
 
-    # delete the unwanted contour in the left bottom corner
-    contour_length = []  # array to record contour length
-    for contour in contours:
-        contour_length.append(len(contour))
-    del contours[contour_length.index(max(contour_length))]
-    del contour_length[contour_length.index(max(contour_length))]
-
+    # convert cartesian coordinates into complex values
     contour_list = []
     for contour in contours:
         contour_list.append(np.asarray(contour))
-
-    # convert cartesian coordinates into complex values
     contour_list_in_complex = []
     for contour_array in contour_list:
         contour_complex = []
@@ -46,27 +38,28 @@ def detect_contour_fft(model_path, test_img_path):
             c_number = complex(pair[0][0], pair[0][1])
             contour_complex.append(c_number)
         contour_complex = np.array(contour_complex)
+        # perform discrete fourier transform
         fft_spectrum = np.fft.fft(contour_complex)
         # fft normalization
-        fft_spectrum /= abs(fft_spectrum[1])
+        fft_spectrum /= fft_spectrum[1]
         truncate_contour = fft_spectrum[1:model_spectrum.size + 1]
         contour_list_in_complex.append(truncate_contour)
 
     # calculate similarity of spectrums
     sim_list = []
     for i, spectrum in enumerate(contour_list_in_complex):
-        if spectrum.size < model_spectrum.size:
-            sim = measure_sim(spectrum, model_spectrum[:spectrum.size])
+        if(spectrum.size < model_spectrum.size):
+            # if contour is too small, ignore it
+            sim = 0
         else:
             sim = measure_sim(spectrum, model_spectrum)
         sim_list.append(sim)
 
     result_list = []
     for i, acc in enumerate(sim_list):
-        # set threshold of the miss matching of 2 spectrums
+        # set treshold of matching accuracy of 2 spectrums
         if acc > 0.93:
             result_list.append(i)
-            print(i, acc)
 
     for i, contour in enumerate(contours):
         if i in result_list:
@@ -76,8 +69,11 @@ def detect_contour_fft(model_path, test_img_path):
 
     cv2.imwrite('./result/detection_result.jpg', test_img)
 
-    plt.imshow(test_img)
-    plt.show()
+    # # print histogram of Accuracy and observe distribution
+    # plt.hist(sim_list)
+    # # print detected contours
+    # plt.imshow(test_img)
+    # plt.show()
 
 
 if __name__ == "__main__":
